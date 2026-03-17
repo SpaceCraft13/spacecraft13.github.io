@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spacious | Northern Portugal Investment Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: #1f2937;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    }
+
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 28px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(15,23,42,0.08);
+      overflow: hidden;
+    }
+
+    .map-panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      min-height: 1080px;
+    }
+
+    .sidebar {
+      padding: 24px;
+      min-height: 1080px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .chip {
+      border: 1px solid #dbe2ea;
+      background: #fff;
+      color: #334155;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      transition: .2s ease;
+    }
+
+    .chip:hover,
+    .chip.active {
+      background: #1f3d3a;
+      color: #fff;
+      border-color: #1f3d3a;
+    }
+
+    .map-shell {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.22);
+      background: #dbeafe;
+      flex: 1;
+      min-height: 1000px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 1000px;
+    }
+
+    .leaflet-container {
+      font-family: 'Inter', sans-serif;
+      background: #dbeafe;
+    }
+
+    .leaflet-control-zoom a {
+      color: #1f2937;
+    }
+
+    .town-label {
+      background: rgba(255,255,255,.92);
+      color: #0f172a;
+      border: 1px solid rgba(148,163,184,.28);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(15,23,42,.08);
+      white-space: nowrap;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .town-label.hovered,
+    .town-label.active {
+      background: #1f3d3a;
+      color: #fff;
+      border-color: #1f3d3a;
+      box-shadow: 0 10px 28px rgba(15,23,42,.16);
+    }
+
+    .bg-town-label {
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+      text-shadow: 0 1px 0 rgba(255,255,255,.85);
+      white-space: nowrap;
+    }
+
+    .custom-town-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #1f3d3a;
+      border: 3px solid #e7a95b;
+      box-shadow: 0 0 0 8px rgba(231,169,91,.16);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .custom-town-icon.hovered,
+    .custom-town-icon.active {
+      transform: scale(1.18);
+      box-shadow: 0 0 0 10px rgba(231,169,91,.22);
+      background: #16353d;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 6px;
+      color: #0f172a;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: #475569;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 14px 0 22px;
+    }
+
+    .tag {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .stat {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .kicker {
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .score-grid {
+      display: grid;
+      gap: 12px;
+      margin: 18px 0 24px;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 42px;
+      gap: 10px;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .bar {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #1f3d3a, #e7a95b);
+    }
+
+    .story-box {
+      border: 1px solid #e2e8f0;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 18px;
+    }
+
+    .story-box h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .story-box p {
+      margin: 0;
+      color: #475569;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .cta {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      text-decoration: none;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: #1f3d3a;
+      color: #fff;
+      font-weight: 600;
+      transition: .2s ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-1px);
+    }
+
+    .footnote {
+      margin-top: 14px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 16px;
+      box-shadow: 0 16px 30px rgba(15,23,42,.16);
+    }
+
+    .leaflet-popup-content {
+      margin: 14px 16px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .popup-title {
+      margin: 0 0 6px;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    .popup-copy {
+      margin: 0;
+      color: #475569;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1020px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar, .map-panel { min-height: auto; }
+      .map-shell, #map { min-height: 760px; }
+    }
+
+    @media (max-width: 768px) {
+      .town-label {
+        font-size: 10px;
+        padding: 4px 8px;
+      }
+      .bg-town-label {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="layout">
+      <section class="panel map-panel">
+        <div class="toolbar" id="filters">
+          <button class="chip active" data-filter="all">All towns</button>
+          <button class="chip" data-filter="coastal">Coastal lifestyle</button>
+          <button class="chip" data-filter="historic">Historic charm</button>
+          <button class="chip" data-filter="rental">Rental upside</button>
+          <button class="chip" data-filter="value">Best value</button>
+        </div>
+
+        <div class="map-shell">
+          <div id="map"></div>
+        </div>
+      </section>
+
+      <aside class="panel sidebar">
+        <div id="details"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const towns = {
+      caminha: {
+        name: 'Caminha',
+        subtitle: 'Best for coastal lifestyle, village charm, and international relocation',
+        coords: [41.8769, -8.8372],
+        categories: ['coastal', 'historic', 'rental'],
+        tags: ['Atlantic coast', 'Walkable center', 'International appeal', 'Strong Spacious story'],
+        stats: {
+          price: 'Mid-range',
+          buyer: 'Lifestyle + hybrid investor',
+          strategy: 'Renovation + second home + rental',
+          vibe: 'Charming and scenic'
+        },
+        scores: [['Lifestyle',95],['Rental upside',82],['Historic charm',88],['Best value',76]],
+        popup: 'Caminha blends river, coast, village charm, and strong emotional appeal for international buyers.',
+        story: 'Caminha is the flagship story for Spacious. It offers beaches, river views, an old-town core, and the kind of emotional appeal that helps international buyers quickly understand why Northern Portugal is special. It works especially well for clients looking for a beautiful base that can also produce rental income before a full-time move.'
+      },
+      moledo: {
+        name: 'Moledo',
+        subtitle: 'Best for premium beachfront lifestyle and elegant second-home buyers',
+        coords: [41.8469, -8.8732],
+        categories: ['coastal', 'rental'],
+        tags: ['Beachfront', 'Premium feel', 'Popular with second-home buyers', 'Surf and sea views'],
+        stats: {
+          price: 'Upper-mid',
+          buyer: 'Lifestyle buyer',
+          strategy: 'Premium second home + seasonal rental',
+          vibe: 'Refined and oceanfront'
+        },
+        scores: [['Lifestyle',94],['Rental upside',84],['Historic charm',54],['Best value',64]],
+        popup: 'Moledo is known for its beach, sea views, and stronger premium coastal positioning.',
+        story: 'Moledo is one of the strongest beach lifestyle stories in the region. It is ideal for clients who want immediate proximity to the ocean, a cleaner premium positioning, and a property that can work both as a personal retreat and as a high-demand summer rental.'
+      },
+      ancora: {
+        name: 'Vila Praia de Âncora',
+        subtitle: 'Best for accessible beach living, walkability, and practical rental potential',
+        coords: [41.8106, -8.8526],
+        categories: ['coastal', 'value', 'rental'],
+        tags: ['Beach town', 'Walkable', 'Train access', 'Balanced value'],
+        stats: {
+          price: 'Good value',
+          buyer: 'Relocator + value buyer',
+          strategy: 'Primary home + year-round rental appeal',
+          vibe: 'Lively and practical'
+        },
+        scores: [['Lifestyle',88],['Rental upside',80],['Historic charm',60],['Best value',83]],
+        popup: 'Âncora combines beach-town energy, convenience, and strong everyday livability.',
+        story: 'Vila Praia de Âncora is especially compelling for buyers who want the coast but need a slightly more practical, accessible market than the most premium beach pockets. It can suit relocators, families, and investors looking for strong usability and steady demand.'
+      },
+      carreco: {
+        name: 'Carreço',
+        subtitle: 'Quiet coastal village between Viana and Afife with strong lifestyle appeal',
+        coords: [41.7427, -8.8736],
+        categories: ['coastal', 'value'],
+        tags: ['Coastal village', 'Near Viana', 'Nature', 'Lower density living'],
+        stats: {
+          price: 'Mid-range',
+          buyer: 'Lifestyle relocator',
+          strategy: 'Primary home + occasional rental',
+          vibe: 'Quiet and scenic'
+        },
+        scores: [['Lifestyle',87],['Rental upside',70],['Historic charm',65],['Best value',78]],
+        popup: 'Carreço is a peaceful coastal village just north of Viana with strong natural beauty.',
+        story: 'Carreço offers a quieter coastal lifestyle while remaining very close to Viana do Castelo. For buyers who want ocean proximity, nature, and a slightly calmer environment than larger towns, it can be an appealing middle ground between Afife and the city.'
+      },
+      afife: {
+        name: 'Afife',
+        subtitle: 'Best for beach buyers, surf lifestyle, and nature-oriented second homes',
+        coords: [41.7775, -8.8606],
+        categories: ['coastal', 'value'],
+        tags: ['Surf beaches', 'Nature', 'Quiet village', 'Holiday rental appeal'],
+        stats: {
+          price: 'Mid to upper-mid',
+          buyer: 'Lifestyle buyer',
+          strategy: 'Holiday rental + second home',
+          vibe: 'Relaxed and ocean-centered'
+        },
+        scores: [['Lifestyle',91],['Rental upside',78],['Historic charm',58],['Best value',71]],
+        popup: 'Afife is a nature-forward beach area known for surf, open scenery, and a relaxed coastal identity.',
+        story: 'Afife is a strong choice for clients drawn to the ocean, outdoor living, and a more relaxed village feel. It is less about urban services and more about natural beauty, surf culture, and a premium lifestyle story. It can be compelling for higher-end seasonal rentals and wellness-oriented buyers.'
+      },
+      viana: {
+        name: 'Viana do Castelo',
+        subtitle: 'Best for city conveniences, architecture, and a broader buyer pool',
+        coords: [41.6932, -8.8329],
+        categories: ['coastal', 'rental', 'historic'],
+        tags: ['Regional city', 'Amenities', 'Historic center', 'Liquidity'],
+        stats: {
+          price: 'Mid-range',
+          buyer: 'Relocator + investor',
+          strategy: 'Apartment or townhouse rental',
+          vibe: 'Refined and practical'
+        },
+        scores: [['Lifestyle',86],['Rental upside',84],['Historic charm',85],['Best value',79]],
+        popup: 'Viana do Castelo is the region’s most versatile urban market with strong year-round utility.',
+        story: 'Viana do Castelo gives buyers a more urban option while still retaining beauty and architectural depth. It is well suited to clients who want stronger everyday infrastructure, a broader range of properties, and easier year-round rental demand. It can anchor the map as the region’s most versatile market.'
+      },
+      esposende: {
+        name: 'Esposende',
+        subtitle: 'Best for broader coastal reach, beach living, and strong regional access south of Viana',
+        coords: [41.5361, -8.7823],
+        categories: ['coastal', 'rental', 'value'],
+        tags: ['Coastal town', 'Good access', 'Beach lifestyle', 'Broader buyer appeal'],
+        stats: {
+          price: 'Mid-range',
+          buyer: 'Coastal relocator',
+          strategy: 'Primary residence + holiday rental',
+          vibe: 'Open and accessible'
+        },
+        scores: [['Lifestyle',84],['Rental upside',79],['Historic charm',62],['Best value',77]],
+        popup: 'Esposende extends the coastal story southward with beaches, access, and a wider practical market.',
+        story: 'Esposende is a useful featured town for buyers who want a coastal lifestyle with strong transport access and a broader regional catchment. It helps Spacious show that attractive opportunities are not limited to the immediate Caminha–Viana corridor.'
+      },
+      cerveira: {
+        name: 'Vila Nova de Cerveira',
+        subtitle: 'Best for art-focused buyers, border access, and understated value',
+        coords: [41.9415, -8.7437],
+        categories: ['historic', 'value'],
+        tags: ['Art town', 'Spain access', 'Quieter pace', 'Character projects'],
+        stats: {
+          price: 'Good value',
+          buyer: 'Creative relocator',
+          strategy: 'Character home + long-term hold',
+          vibe: 'Cultured and calm'
+        },
+        scores: [['Lifestyle',80],['Rental upside',69],['Historic charm',83],['Best value',87]],
+        popup: 'Cerveira offers cultural depth, quieter charm, and an appealing cross-border position.',
+        story: 'Vila Nova de Cerveira offers a quieter, more understated version of the Northern Portugal dream. It appeals to artists, remote workers, and buyers who want beauty without the pricing pressure of more obvious coastal spots. Spacious can position it as a smart long-term value play with cultural depth.'
+      },
+      ponte: {
+        name: 'Ponte de Lima',
+        subtitle: 'Best for prestige, historic character, and inland estate-style living',
+        coords: [41.7676, -8.5839],
+        categories: ['historic', 'rental'],
+        tags: ['Prestige town', 'Wine country', 'Historic center', 'Estate potential'],
+        stats: {
+          price: 'Upper-mid',
+          buyer: 'Lifestyle investor',
+          strategy: 'Boutique hospitality or estate home',
+          vibe: 'Elegant and timeless'
+        },
+        scores: [['Lifestyle',89],['Rental upside',75],['Historic charm',94],['Best value',67]],
+        popup: 'Ponte de Lima is one of the most iconic historic towns in Northern Portugal.',
+        story: 'Ponte de Lima feels storied, polished, and highly photogenic. It is particularly strong for buyers interested in traditional architecture, countryside estates, and boutique hospitality concepts. Spacious can use it to speak to clients who want classic Portugal with a stronger prestige profile.'
+      },
+      valenca: {
+        name: 'Valença',
+        subtitle: 'Best for cross-border convenience, value, and fortress-town identity',
+        coords: [42.0314, -8.6453],
+        categories: ['historic', 'value', 'rental'],
+        tags: ['Fortified town', 'Spain access', 'Trade flows', 'Entry pricing'],
+        stats: {
+          price: 'Strong value',
+          buyer: 'Value-focused investor',
+          strategy: 'Entry investment + renovation',
+          vibe: 'Strategic and overlooked'
+        },
+        scores: [['Lifestyle',72],['Rental upside',73],['Historic charm',81],['Best value',90]],
+        popup: 'Valença is a strong value story with a strategic border location and historic identity.',
+        story: 'Valença is one of the most strategic value stories on the map. Its location near Spain, fortified heritage, and often friendlier pricing can make it attractive for buyers who want an entry point into the region. It is especially useful in conversations about stable asset acquisition in an undervalued market.'
+      }
+    };
+
+    const backgroundTowns = [
+      { name: 'Porto', coords: [41.1579, -8.6291] },
+      { name: 'Braga', coords: [41.5454, -8.4265] },
+      { name: 'Arcos de Valdevez', coords: [41.8467, -8.4191] },
+      { name: 'Monção', coords: [42.0788, -8.4827] },
+      { name: 'Melgaço', coords: [42.1128, -8.2603] },
+      { name: 'Barcelos', coords: [41.5388, -8.6151] },
+      { name: 'Paredes de Coura', coords: [41.9093, -8.5605] }
+    ];
+
+    const details = document.getElementById('details');
+    const chips = [...document.querySelectorAll('.chip')];
+
+    const defaultCenter = [41.80, -8.88];
+    const defaultZoom = 9.8;
+
+    const map = L.map('map', {
+      zoomControl: true,
+      scrollWheelZoom: true,
+      dragging: true,
+      doubleClickZoom: true,
+      boxZoom: true,
+      touchZoom: true
+    }).setView(defaultCenter, defaultZoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const portugalBounds = L.latLngBounds([[36.8, -9.7], [42.3, -6.0]]);
+    map.setMaxBounds(portugalBounds.pad(0.12));
+
+    const markerLayer = L.layerGroup().addTo(map);
+    const backgroundLayer = L.layerGroup().addTo(map);
+    const townMarkers = {};
+    const labelMarkers = [];
+
+    function townIcon() {
+      return L.divIcon({
+        className: '',
+        html: '<div class="custom-town-icon"></div>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+      });
+    }
+
+    function labelIcon(name, variant = 'right') {
+      const positions = {
+        right: 'translate(14px, -10px)',
+        left: 'translate(-126px, -10px)',
+        up: 'translate(-44px, -34px)',
+        down: 'translate(-44px, 14px)',
+        upRight: 'translate(14px, -30px)',
+        downRight: 'translate(14px, 10px)'
+      };
+      const transform = positions[variant] || positions.right;
+      return L.divIcon({
+        className: '',
+        html: `<div class="town-label" style="transform:${transform};">${name}</div>`,
+        iconSize: [140, 30],
+        iconAnchor: [0, 0]
+      });
+    }
+
+    function bgLabelIcon(name) {
+      return L.divIcon({
+        className: '',
+        html: `<div class="bg-town-label">${name}</div>`,
+        iconSize: [120, 20],
+        iconAnchor: [0, 0]
+      });
+    }
+
+    const labelPositions = {
+      caminha: 'upRight',
+      moledo: 'right',
+      ancora: 'right',
+      afife: 'right',
+      carreco: 'right',
+      viana: 'right',
+      esposende: 'right',
+      cerveira: 'right',
+      ponte: 'right',
+      valenca: 'right'
+    };
+
+    function setMarkerState(id, state) {
+      const pair = townMarkers[id];
+      if (!pair) return;
+
+      const dot = pair.marker.getElement()?.querySelector('.custom-town-icon');
+      const tab = pair.label.getElement()?.querySelector('.town-label');
+
+      if (dot) {
+        dot.classList.toggle('hovered', state === 'hover');
+        dot.classList.toggle('active', state === 'active');
+      }
+
+      if (tab) {
+        tab.classList.toggle('hovered', state === 'hover');
+        tab.classList.toggle('active', state === 'active');
+      }
+    }
+
+    function clearStates() {
+      Object.keys(townMarkers).forEach(id => {
+        setMarkerState(id, 'idle');
+      });
+    }
+
+    function renderTown(id) {
+      const town = towns[id];
+
+      clearStates();
+      setMarkerState(id, 'active');
+
+      details.innerHTML = `
+        <h2>${town.name}</h2>
+        <p class="subtitle">${town.subtitle}</p>
+        <div class="meta">
+          ${town.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+        <div class="stat-cards">
+          <div class="stat"><div class="kicker">Typical pricing feel</div><div class="value">${town.stats.price}</div></div>
+          <div class="stat"><div class="kicker">Best fit buyer</div><div class="value">${town.stats.buyer}</div></div>
+          <div class="stat"><div class="kicker">Strongest strategy</div><div class="value">${town.stats.strategy}</div></div>
+          <div class="stat"><div class="kicker">Market character</div><div class="value">${town.stats.vibe}</div></div>
+        </div>
+        <div class="score-grid">
+          ${town.scores.map(([label, value]) => `
+            <div class="score-row">
+              <div>${label}</div>
+              <div class="bar"><span style="width:${value}%"></span></div>
+              <div>${value}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="story-box">
+          <h3>Why this area matters</h3>
+          <p>${town.story}</p>
+        </div>
+        <a class="cta" href="mailto:spaciousworldwide@yahoo.com?subject=${encodeURIComponent(`Listings in ${town.name}`)}&body=${encodeURIComponent(`Hello Spacious,\n\nPlease send me available property listings in ${town.name}.\n\nThank you.`)}">
+          View available properties in ${town.name}
+        </a>
+        <div class="footnote">Map locations are intended as a client-friendly exploration tool for Spacious. You can later layer in property listings, renovation case studies, or local pricing bands.</div>
+      `;
+    }
+
+    function popupHtml(town) {
+      return `<h3 class="popup-title">${town.name}</h3><p class="popup-copy">${town.popup}</p>`;
+    }
+
+    function focusTown(id, zoom = 12) {
+      const town = towns[id];
+      map.flyTo(town.coords, zoom, { duration: 0.8 });
+      renderTown(id);
+    }
+
+    Object.entries(towns).forEach(([id, town]) => {
+      const marker = L.marker(town.coords, { icon: townIcon() }).addTo(markerLayer);
+      const label = L.marker(
+        town.coords,
+        { icon: labelIcon(town.name, labelPositions[id]), interactive: true }
+      ).addTo(markerLayer);
+
+      marker.bindPopup(popupHtml(town));
+
+      marker.on('click', () => focusTown(id, 12));
+      label.on('click', () => focusTown(id, 12));
+
+      marker.on('mouseover', () => {
+        if (!marker.getElement()?.querySelector('.custom-town-icon')?.classList.contains('active')) {
+          setMarkerState(id, 'hover');
+        }
+      });
+      marker.on('mouseout', () => {
+        if (!marker.getElement()?.querySelector('.custom-town-icon')?.classList.contains('active')) {
+          setMarkerState(id, 'idle');
+        }
+      });
+
+      label.on('mouseover', () => {
+        if (!marker.getElement()?.querySelector('.custom-town-icon')?.classList.contains('active')) {
+          setMarkerState(id, 'hover');
+        }
+      });
+      label.on('mouseout', () => {
+        if (!marker.getElement()?.querySelector('.custom-town-icon')?.classList.contains('active')) {
+          setMarkerState(id, 'idle');
+        }
+      });
+
+      townMarkers[id] = { marker, label, town };
+      labelMarkers.push(label);
+    });
+
+    backgroundTowns.forEach(item => {
+      const bg = L.marker(item.coords, { icon: bgLabelIcon(item.name), interactive: false }).addTo(backgroundLayer);
+      labelMarkers.push(bg);
+    });
+
+    function updateLabelVisibility() {
+      const zoom = map.getZoom();
+      labelMarkers.forEach(marker => {
+        const el = marker.getElement();
+        if (!el) return;
+        el.style.transition = 'opacity .25s ease';
+        el.style.opacity = zoom >= 9.4 ? '1' : '0';
+      });
+    }
+
+    map.on('zoomend', updateLabelVisibility);
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const filter = chip.dataset.filter;
+        chips.forEach(c => c.classList.toggle('active', c === chip));
+
+        map.setView(defaultCenter, defaultZoom, { animate: true });
+
+        let firstTown = null;
+        Object.entries(townMarkers).forEach(([id, pair]) => {
+          const visible = filter === 'all' || pair.town.categories.includes(filter);
+          if (visible && !firstTown) firstTown = id;
+          if (visible) {
+            markerLayer.addLayer(pair.marker);
+            markerLayer.addLayer(pair.label);
+          } else {
+            markerLayer.removeLayer(pair.marker);
+            markerLayer.removeLayer(pair.label);
+          }
+        });
+
+        if (firstTown) {
+          renderTown(firstTown);
+        }
+        updateLabelVisibility();
+      });
+    });
+
+    renderTown('caminha');
+    updateLabelVisibility();
+    setTimeout(() => map.invalidateSize(), 200);
+  </script>
+</body>
+</html>

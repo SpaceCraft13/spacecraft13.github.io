@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Relocation Guide | Spacious Portugal</title>
+  <meta name="description" content="Private access page for the Spacious relocation and investment guide for Northern Portugal.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#183a4a;
+      --deep-teal:#1f4b55;
+      --sea-blue:#5f8faa;
+      --mist-blue:#dce7ef;
+      --sand:#e7c28c;
+      --cloud:#f5f7fa;
+      --stone:#ffffff;
+      --text:#233342;
+      --muted:#5a6b7b;
+      --shadow:0 18px 50px rgba(24,58,74,.12);
+      --border:1px solid rgba(34,58,74,.10);
+      --radius:24px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Inter',sans-serif;
+      color:var(--text);
+      line-height:1.65;
+      background:linear-gradient(180deg,#eef4f8 0%,#f7fafc 30%,#ffffff 100%);
+    }
+    a{text-decoration:none}
+    .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 72px}
+    .topbar{
+      display:flex;justify-content:space-between;align-items:center;gap:16px;
+      margin-bottom:24px;
+    }
+    .brand{font-weight:800;letter-spacing:.04em;color:var(--navy);font-size:1.08rem}
+    .back{color:var(--deep-teal);font-weight:600}
+    .hero{
+      position:relative;overflow:hidden;border-radius:34px;box-shadow:var(--shadow);
+      padding:72px 36px;color:#fff;
+      background:
+        linear-gradient(180deg, rgba(16,32,41,.56) 0%, rgba(21,51,68,.52) 100%),
+        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    }
+    .hero::after{
+      content:"";position:absolute;inset:0;
+      background:url('images/north-overlay.jpg') center/cover no-repeat;
+      opacity:.16;mix-blend-mode:screen;pointer-events:none;
+    }
+    .hero > *{position:relative;z-index:1}
+    .eyebrow{
+      display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+      padding:8px 14px;border-radius:999px;font-size:.84rem;font-weight:700;margin-bottom:18px;backdrop-filter:blur(8px);
+    }
+    h1{font-size:clamp(2.1rem,5vw,4rem);line-height:1.03;letter-spacing:-.03em;margin-bottom:16px}
+    .hero p{max-width:760px;color:rgba(255,255,255,.93);font-size:1.08rem}
+    .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+    .btn{
+      display:inline-block;padding:14px 22px;border-radius:14px;font-weight:700;transition:.2s ease;border:1px solid transparent;
+      box-shadow:0 12px 28px rgba(0,0,0,.12);
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:linear-gradient(135deg,var(--sand),#dca66b);color:#203240}
+    .btn-secondary{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff}
+    .section{padding:34px 0 0}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+    .card{
+      background:rgba(255,255,255,.9);border:var(--border);border-radius:28px;
+      padding:28px;box-shadow:var(--shadow);
+    }
+    .card h2{font-size:1.45rem;color:#183240;margin-bottom:10px;letter-spacing:-.02em}
+    .card p{color:var(--muted)}
+    .email-box{
+      background:rgba(24,58,74,.04);border:1px solid rgba(24,58,74,.08);
+      border-radius:18px;padding:14px 16px;margin:16px 0 18px;word-break:break-word;
+    }
+    .email-box strong{display:block;color:var(--navy);margin-bottom:6px}
+    .notice{
+      margin-top:14px;padding:13px 15px;border-radius:16px;
+      background:#fff7ea;border:1px solid #f0dfc3;color:#6a5837;font-size:.95rem;
+    }
+    .checklist{margin-top:10px;padding-left:20px;color:var(--muted)}
+    .checklist li{margin:8px 0}
+    .guide-layout{display:grid;grid-template-columns:1fr;gap:24px;margin-top:24px}
+    .guide-content{
+      background:#fff;border:var(--border);border-radius:30px;padding:34px;box-shadow:var(--shadow);
+    }
+    .guide-content h2{font-size:2rem;letter-spacing:-.03em;margin-bottom:18px;color:#172f3b}
+    .guide-content h3{font-size:1.28rem;margin:28px 0 12px;color:var(--deep-teal)}
+    .guide-content p{color:var(--muted);margin:0 0 14px}
+    .guide-content ul{padding-left:20px;color:var(--muted)}
+    .guide-content li{margin:8px 0}
+    .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+    .pill{
+      padding:8px 12px;border-radius:999px;background:#edf4f8;color:var(--deep-teal);
+      border:1px solid rgba(31,75,85,.12);font-size:.92rem;font-weight:600;
+    }
+    .split-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
+    .mini-card{background:#f7fafc;border:var(--border);border-radius:20px;padding:18px}
+    .mini-card h4{color:#183240;margin-bottom:8px;font-size:1.02rem}
+    .pdf-box{background:#fff;border:var(--border);border-radius:30px;padding:24px;box-shadow:var(--shadow)}
+    .pdf-box h2{margin-bottom:8px;color:#183240}
+    .pdf-box p{color:var(--muted);margin-bottom:14px}
+    .pdf-frame{width:100%;height:980px;border:none;border-radius:20px;background:#dce7ef}
+    .footer-cta{
+      margin-top:28px;background:linear-gradient(135deg,#1b3c4b 0%, #29586a 100%);color:#fff;
+      border-radius:30px;padding:28px;border:1px solid rgba(255,255,255,.08);
+    }
+    .footer-cta h3{font-size:1.5rem;margin-bottom:8px}
+    .footer-cta p{color:rgba(255,255,255,.88);margin-bottom:16px}
+    @media (max-width: 920px){
+      .grid,.split-grid{grid-template-columns:1fr}
+      .pdf-frame{height:720px}
+      .hero{padding:52px 24px}
+      .guide-content{padding:24px}
+    }
+    @media (max-width: 640px){
+      .wrap{padding:20px 14px 48px}
+      .pdf-frame{height:560px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">Spacious</div>
+      <a class="back" href="index.html">Back to home</a>
+    </div>
+
+    <section class="hero">
+      <div class="eyebrow">Private Access • Spacious Guide</div>
+      <h1>Move &amp; Invest in Northern Portugal</h1>
+      <p>
+        This private page gives your visitors immediate access to your relocation and investment guide.
+        It also displays the email they entered so the page feels personalized and lead-focused.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="spacious-relocation-guide.pdf" download>Download the Guide PDF</a>
+        <a class="btn btn-secondary" href="#guide-preview">Preview the Guide</a>
+      </div>
+    </section>
+
+    <section class="section grid">
+      <div class="card">
+        <h2>Your lead details</h2>
+        <p>This page reads the visitor email from the URL and keeps it visible here for the session.</p>
+        <div class="email-box">
+          <strong>Email submitted</strong>
+          <div id="capturedEmail">No email detected</div>
+        </div>
+        <p>At this stage, the email is only stored in the visitor browser unless you later connect a form capture service or backend.</p>
+        <div class="notice">This page uses <strong>noindex</strong>, so it should stay hidden from Google search results.</div>
+      </div>
+
+      <div class="card">
+        <h2>What the guide covers</h2>
+        <ul class="checklist">
+          <li>Why Northern Portugal stands out for relocation and investment</li>
+          <li>Visa pathways including D7, Digital Nomad, Entrepreneur, and Golden Visa</li>
+          <li>NIF setup, banking, property buying steps, and financing</li>
+          <li>Income strategies such as short-term, long-term, and boutique hospitality</li>
+          <li>How Spacious supports discovery, renovation, management, and relocation</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="guide-layout">
+      <div class="guide-content">
+        <h2>Guide Summary</h2>
+        <p><strong>Move &amp; Invest in Northern Portugal</strong> is positioned as a relocation and investment guide powered by Spacious. It explains why the north offers a slower pace of life, authentic culture, safety, affordability, and strong lifestyle value for international buyers.</p>
+
+        <div class="pill-row">
+          <span class="pill">Caminha</span>
+          <span class="pill">Viana do Castelo</span>
+          <span class="pill">Ponte de Lima</span>
+          <span class="pill">Minho Region</span>
+          <span class="pill">Relocation + Investment</span>
+        </div>
+
+        <h3>Why Northern Portugal</h3>
+        <p>The guide highlights Atlantic beaches, mountain trails, the Minho River, historic towns, strong food culture, and a lower cost of living than much of Western Europe. It frames the region as a compelling alternative to the more over-touristed south of Portugal.</p>
+
+        <h3>Visa pathways covered</h3>
+        <div class="split-grid">
+          <div class="mini-card">
+            <h4>D7 Visa</h4>
+            <p>For applicants with passive income, plus banking, accommodation, health insurance, and a clean record.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Digital Nomad Visa</h4>
+            <p>For remote workers or business owners meeting income thresholds and documentation requirements.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Entrepreneur Visa</h4>
+            <p>For those building a viable business in Portugal with investment and job creation potential.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Golden Visa</h4>
+            <p>Described as an investment-based path with low stay requirements and possible long-term residency benefits.</p>
+          </div>
+        </div>
+
+        <h3>NIF, banking, and buying property</h3>
+        <p>The guide explains that a Portuguese tax number is essential for major transactions including banking, property purchases, leases, business formation, and visa processes. It also outlines the property buying flow: finding the right property, due diligence, promissory contract, final deed, registration, taxes, and financing.</p>
+
+        <h3>Income strategies and wealth positioning</h3>
+        <p>It presents several property-use strategies, including short-term rentals, long-term rentals, boutique hospitality, and hybrid owner-use models. The guide also frames Northern Portugal real estate as a hedge against inflation, volatility, and geopolitical uncertainty.</p>
+
+        <h3>How Spacious helps</h3>
+        <p>The final section positions Spacious as a local partner for property discovery, renovation and design, property management, and relocation support from the first search through long-term ownership.</p>
+
+        <div class="footer-cta">
+          <h3>Ready to talk about your move?</h3>
+          <p>Use this guide as the starting point, then follow up with Spacious for help choosing towns, evaluating properties, planning renovation, or mapping out the relocation process.</p>
+          <a class="btn btn-primary" id="emailLink" href="mailto:spaciousworldwide@yahoo.com?subject=Spacious%20Relocation%20Guide%20Request">Email Spacious</a>
+        </div>
+      </div>
+
+      <div class="pdf-box" id="guide-preview">
+        <h2>Guide preview + download</h2>
+        <p>The full uploaded guide is embedded below and can also be downloaded directly.</p>
+        <iframe class="pdf-frame" src="spacious-relocation-guide.pdf" title="Spacious relocation guide PDF preview"></iframe>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+    const captured = document.getElementById('capturedEmail');
+    const emailLink = document.getElementById('emailLink');
+
+    if (email) {
+      captured.textContent = email;
+      try { localStorage.setItem('spacious_guide_email', email); } catch (e) {}
+      emailLink.href = 'mailto:spaciousworldwide@yahoo.com?subject=Spacious%20Relocation%20Guide%20Request&body=' + encodeURIComponent('Hello Spacious, I accessed the relocation guide with this email: ' + email);
+    } else {
+      let savedEmail = '';
+      try { savedEmail = localStorage.getItem('spacious_guide_email') || ''; } catch (e) {}
+      if (savedEmail) {
+        captured.textContent = savedEmail;
+        emailLink.href = 'mailto:spaciousworldwide@yahoo.com?subject=Spacious%20Relocation%20Guide%20Request&body=' + encodeURIComponent('Hello Spacious, I accessed the relocation guide with this email: ' + savedEmail);
+      }
+    }
+  </script>
+</body>
+</html>
